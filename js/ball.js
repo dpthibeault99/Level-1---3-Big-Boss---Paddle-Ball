@@ -21,8 +21,43 @@ class Ball {
         this.context.closePath();
     }
 
+    gravity(){
+
+    }
+
        update() {
         this.x += this.speedX;
         this.y += this.speedY;
        }
+
+    left() {
+    return this.x - this.radius;
+}
+
+right() {
+    return this.x + this.radius;
+}
+
+top() {
+    return this.y - this.radius;
+}
+
+bottom() {
+    return this.y + this.radius;
+}
+
+collisionCheck(obj) {
+    if (
+        this.left() < obj.right() &&
+        this.right() > obj.left() &&
+        this.top() < obj.bottom() &&
+        this.bottom() > obj.top()
+    ) {
+        return true;
+    }
+
+    return false;
+}
+
+       
 }

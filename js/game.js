@@ -3,109 +3,59 @@ var context;
 var player;
 var ball;
 var timer;
-var interval = 1000 / 60; // 60 fps
+var interval = 1000 / 60;
+
+var frictionX = 0.9;
+var gravity = 1;
 
 canvas = document.getElementById("myCanvas");
 context = canvas.getContext("2d");
 
-// the paddle
-//---------------------(x, y, w, h, color)
-player = new gameObject(canvas.width / 2, canvas.height , 300, 50, "#00ffff");
+player = new gameObject(canvas.width / 2, canvas.height, 300, 50, "#00ffff");
 player.vx = 0;
 player.vy = 0;
 
-// the ball
 ball = new Ball(canvas, context);
+ball.vx = 0;
+ball.vy = 0;
+
 timer = setInterval(animate, interval);
 
 function animate()
 {
-        context.clearRect(0, 0, canvas.width, canvas.height);
+    context.clearRect(0, 0, canvas.width, canvas.height);
 
-        net();
+    net();
 
+    handleInput();
+    handlePlayerBoundry();
 
-        // //The Score // 
-        // context.fillStyle = "#000000";
-        // context.font = "30px Arial";
-        // context.fillText("P1:"+ p1Score, 400, 50);
-        // context.fillText("P2:"+ p2Score, 550, 50)
+    doHandleFriction();
+    doHandleGravity();
+    doUpdateBallPosition();
+    doCheckBallBounds();
+    collisionCheck();
 
-        //player 1
-        if (a)
-        {
-                player.x -= 4;
-        }
+    player.drawRect();
+    player.move();
 
-        if (d)
-        {
-                player.x += 4;
-        }
-        //player 2
-     
-        boundry();
-
-        //player 1
-        // if (ball.collisionCheck(player))
-        // {
-        //         ball.x = player.right() + ball.radius;
-        //         ball.color = "#615316";
-
-        //         //player 1
-        //         if (ball.y < player.y - (player.height / 6))
-        //         {
-        //                 ball.speedX = 5;
-        //                 ball.speedY = -5;
-        //         }
-        //         else if (ball.y > player.y + (player.height / 6))
-        //         {
-        //                 ball.speedX = 5;
-        //                 ball.speedY = 5;
-        //         }
-        //         else
-        //         {
-        //                 ball.speedX = 5;
-        //                 ball.speedY = 0;
-        //         }                
-        // }
-
-        //player 2
-
-        // if (ball.collisionCheck(player2))
-        // {
-        //         ball.x = player2.left() - ball.radius;
-        //         ball.color = "#452341";
-
-        //         if (ball.y < player2.y - (player2.height / 6))
-        //         {
-        //                 ball.speedX = -5;
-        //                 ball.speedY = -5;
-        //         }
-        //         else if (ball.y > player2.y + (player2.height / 6))
-        //         {
-        //                 ball.speedX = -5;
-        //                 ball.speedY = 5;
-        //         }
-        //         else
-        //         {
-        //                 ball.speedX = -5;
-        //                 ball.speedY = 0;
-        //         }
-        // }
-
-
-        player.drawRect();
-        player.move();
-
-        // player2.drawRect();
-        // player2.move();
-
-        ball.drawBall();
-        ball.update();
+    ball.drawBall();
 }
 
+function handleInput()
+{
+    if (a)
+    {
+        player.x -= 4;
+    }
 
-function boundry()
+    if (d)
+    {
+        player.x += 4;
+    }
+}
+
+function handlePlayerBoundry()
 {
     if (player.y > canvas.height - player.height / 2)
     {
@@ -117,30 +67,86 @@ function boundry()
         player.y = player.height / 2;
     }
 
-    // if (player2.y > canvas.height - player2.height / 2)
-    //     {
-    //     player2.y = canvas.height - player2.height / 2;
-    //     }
+    if (player.x + player.width / 2 > canvas.width)
+    {
+        player.x = canvas.width - player.width / 2;
+    }
 
-    //     if (player2.y < player2.height / 2)
-    //     {
-    //     player2.y = player2.height / 2;
-    //     }
+    if (player.x - player.width / 2 < 0)
+    {
+        player.x = player.width / 2;
+    }
+}
 
+function doHandleFriction()
+{
+    ball.vx *= frictionX;
+}
+
+function doHandleGravity()
+{
+    ball.vy += gravity;
+}
+
+function doUpdateBallPosition()
+{
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+}
+
+function doCheckBallBounds()
+{
+    if (ball.y + ball.radius > canvas.height)
+    {
+        ball.y = canvas.height - ball.radius;
+        ball.vy = 0;
+    }
+
+    if (ball.y - ball.radius < 0)
+    {
+        ball.y = ball.radius;
+        ball.vy = 0;
+    }
+
+    if (ball.x + ball.radius > canvas.width)
+    {
+        ball.x = canvas.width - ball.radius;
+        ball.vx = -ball.vx;
+    }
+
+    if (ball.x - ball.radius < 0)
+    {
+        ball.x = ball.radius;
+        ball.vx = -ball.vx;
+    }
+
+    if (w && ball.y + ball.radius >= canvas.height)
+    {
+        ball.vy = -20;
+    }
 }
 
 function net()
 {
     context.save();
 
-    context.strokeStyle = "#ff0000"; 
+    context.strokeStyle = "#ff0000";
     context.lineWidth = 10;
 
     context.beginPath();
-
-    context.moveTo(ball.x, ball.y);// top
-    context.lineTo(player.x, player.y);//bottom
-
+    context.moveTo(ball.x, ball.y);
+    context.lineTo(player.x, player.y);
     context.stroke();
+
     context.restore();
 }
+function collisionCheck()
+{
+    if (ball.collisionCheck(player))
+    {
+        ball.y = player.top() - ball.radius;
+
+        ball.vy = -20;
+    }
+}
+
