@@ -32,14 +32,14 @@ function animate()
         // context.fillText("P2:"+ p2Score, 550, 50)
 
         //player 1
-        if (w)
+        if (a)
         {
-                player.y -= 4;
+                player.x -= 4;
         }
 
-        if (s)
+        if (d)
         {
-                player.y += 4;
+                player.x += 4;
         }
         //player 2
      
@@ -138,8 +138,8 @@ function net()
 
     context.beginPath();
 
-    context.moveTo(canvas.width / 2, 0);
-    context.lineTo(canvas.width / 2, canvas.height);
+    context.moveTo(ball.x, ball.y);// top
+    context.lineTo(player.x, player.y);//bottom
 
     context.stroke();
     context.restore();
