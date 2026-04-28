@@ -1,12 +1,15 @@
 var canvas;
 var context;
 var player;
+var p1Score = 0;
 var ball;
 var timer;
 var interval = 1000 / 60;
 
 var frictionX = 0.9;
 var gravity = 1;
+var vy = 0;
+var vx = 0;
 
 canvas = document.getElementById("myCanvas");
 context = canvas.getContext("2d");
@@ -26,6 +29,8 @@ function animate()
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     net();
+
+    Score();
 
     handleInput();
     handlePlayerBoundry();
@@ -99,31 +104,38 @@ function doCheckBallBounds()
     if (ball.y + ball.radius > canvas.height)
     {
         ball.y = canvas.height - ball.radius;
-        ball.vy = 0;
+        ball.vy = ball.vy * -.67;
+        p1Score = 0;
+        console.log("Bottomaaaaaaaa");
     }
 
     if (ball.y - ball.radius < 0)
     {
         ball.y = ball.radius;
-        ball.vy = 0;
+        ball.vy = ball.vy;
+        console.log("Topa");
+
     }
 
     if (ball.x + ball.radius > canvas.width)
     {
         ball.x = canvas.width - ball.radius;
         ball.vx = -ball.vx;
+        console.log("Test3");
+
     }
 
     if (ball.x - ball.radius < 0)
     {
         ball.x = ball.radius;
         ball.vx = -ball.vx;
+        console.log("Test4");
     }
 
-    if (w && ball.y + ball.radius >= canvas.height)
-    {
-        ball.vy = -20;
-    }
+    // if (w && ball.y + ball.radius >= canvas.height)
+    // {
+    //     ball.vy = -20;
+    // }
 }
 
 function net()
@@ -146,7 +158,30 @@ function collisionCheck()
     {
         ball.y = player.top() - ball.radius;
 
-        ball.vy = -20;
-    }
-}
+        p1Score++;
 
+          if (ball.y < player.y - (player.width / 6))
+                {
+                        ball.vy = -30;
+
+                }
+                else if (ball.y < player.y + (player.width / 6))
+                {
+                         ball.vy = 0;
+                         ball.vx = -5
+
+                }
+                else
+                {
+                        ball.speedX = 5;
+                        ball.speedY = 0;
+                }         
+    }
+  
+}
+function Score()
+{
+    context.fillStyle = "#000000";
+    context.font = "30px Arial";
+    context.fillText("Score:"+ p1Score, 50, 50);
+}
