@@ -86,6 +86,7 @@ function handlePlayerBoundry()
 function doHandleFriction()
 {
     ball.vx *= frictionX;
+    player.vy *= player.vy;
 }
 
 function doHandleGravity()
@@ -121,7 +122,7 @@ function doCheckBallBounds()
     {
         ball.x = canvas.width - ball.radius;
         ball.vx = -ball.vx;
-        console.log("Test3");
+        console.log("right");
 
     }
 
@@ -129,20 +130,20 @@ function doCheckBallBounds()
     {
         ball.x = ball.radius;
         ball.vx = -ball.vx;
-        console.log("Test4");
+        console.log("Left");
     }
 
     // if (w && ball.y + ball.radius >= canvas.height)
-    // {
+    //  {
     //     ball.vy = -20;
-    // }
+    //  }
 }
 
 function net()
 {
     context.save();
 
-    context.strokeStyle = "#ff0000";
+    context.strokeStyle = "#000000";
     context.lineWidth = 10;
 
     context.beginPath();
@@ -154,30 +155,52 @@ function net()
 }
 function collisionCheck()
 {
-    if (ball.collisionCheck(player))
+    if (ball.collisionCheck(player) && ball.vy > 0)
     {
+        // put ball on top of paddle
         ball.y = player.top() - ball.radius;
 
         p1Score++;
 
-          if (ball.y < player.y - (player.width / 6))
-                {
-                        ball.vy = -30;
+        // find where ball hit the paddle
+        let hitPoint = ball.x - player.x;
 
-                }
-                else if (ball.y < player.y + (player.width / 6))
-                {
-                         ball.vy = 0;
-                         ball.vx = -5
+        let centerZone = player.width / 6;
+        let innerZone = player.width / 3;
 
-                }
-                else
-                {
-                        ball.speedX = 5;
-                        ball.speedY = 0;
-                }         
+        // always bounce upward
+        ball.vy = -25;
+
+        // CENTER 1/3
+        if (hitPoint > -centerZone && hitPoint < centerZone)
+        {
+            ball.vx = 0;
+        }
+
+        // INNER LEFT 1/6
+        else if (hitPoint < -centerZone && hitPoint > -innerZone)
+        {
+            ball.vx = -ball.force;
+        }
+
+        // INNER RIGHT 1/6
+        else if (hitPoint > centerZone && hitPoint < innerZone)
+        {
+            ball.vx = ball.force;
+        }
+
+        // OUTER LEFT 1/6
+        else if (hitPoint <= -innerZone)
+        {
+            ball.vx = -ball.force * 5;
+        }
+
+        // OUTER RIGHT 1/6
+        else if (hitPoint >= innerZone)
+        {
+            ball.vx = ball.force * 5;
+        }
     }
-  
 }
 function Score()
 {

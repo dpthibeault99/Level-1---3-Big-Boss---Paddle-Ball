@@ -12,8 +12,9 @@ class Ball {
         this.speedX = 0;
         this.speedY = 0;
 
-        this.vx = 5;
+       this.vx = 5;
         this.vy = 0;
+        this.force = 5;
     }
 
      drawBall() {
