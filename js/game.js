@@ -11,6 +11,11 @@ var gravity = 1;
 var vy = 0;
 var vx = 0;
 
+var playerFriction = 0.85;
+var playerSpeed = 1.5;
+var playerMaxSpeed = 15;
+
+
 canvas = document.getElementById("myCanvas");
 context = canvas.getContext("2d");
 
@@ -49,16 +54,27 @@ function animate()
 
 function handleInput()
 {
-    if (a)
+    if (a || left)
     {
-        player.x -= 4;
+        player.vx -= playerSpeed;
     }
 
-    if (d)
+    if (d || right)
     {
-        player.x += 4;
+        player.vx += playerSpeed;
+    }
+
+    if (player.vx > playerMaxSpeed)
+    {
+        player.vx = playerMaxSpeed;
+    }
+
+    if (player.vx < -playerMaxSpeed)
+    {
+        player.vx = -playerMaxSpeed;
     }
 }
+
 
 function handlePlayerBoundry()
 {
